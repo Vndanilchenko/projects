@@ -26,12 +26,16 @@ def _test():
 #     response.headers['Content-Type'] = 'application/json'
 #     # и вернули
 # выведем функцию, которая будет возвращать 1, если вопрос есть в базе знаний и
-    response_body = request_json['test_val']
-    # if response_body in ['test', 'hello']:
-    #     return 1
-    # else:
-    #     return 0
-    return response_body
+#     response_body = request_json['test_val']
+#     if response_body in ['test', 'hello']:
+#         return 1
+#     else:
+#         return 0
+    return '''<h1>
+        {}
+        </h1>'''.format(request_json['test_val'])
+
+
 
 
 
@@ -47,5 +51,5 @@ if __name__ == '__main__':
     # response = make_response(response_body)
     # response.headers['Content-Type'] = 'application/json'
     # и вернули
-    port = int(os.getenv('PORT', 5000))
-    app.run(debug=False, port=port, host='0.0.0.0')
+    # port = int(os.getenv('PORT', 5000))
+    app.run(debug=False, port=5000)
