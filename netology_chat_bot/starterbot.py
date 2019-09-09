@@ -8,9 +8,8 @@ from slackclient import SlackClient
 
 
 # instantiate Slack client
-# slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
+slack_client = SlackClient(os.environ.get('SlACK_TOKEN'))
 
-slack_client = SlackClient('xoxb-744866006324-749889197780-Z1Y0b3MiOJViTE3dg2KJnefr')
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 starterbot_id = None
 
