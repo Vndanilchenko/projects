@@ -58,16 +58,17 @@ def handle_command(command, channel):
     # Finds and executes the given command, filling in response
     response = None
     # This is where you start to implement more commands!
-    if command.startswith(EXAMPLE_COMMAND):
-        response = "Sure...write some more code then I can do that!"
+    # if command.startswith(EXAMPLE_COMMAND):
+    #     response = "Sure...write some more code then I can do that!"
 
     # попробуем вывести овтеты из словаря, если текст сообщения будет более чем на 0,9 соответствовать сообщениям в словаре
-    scores=[]
-    for sentence in phrases:
-        scores.append(cosine_similarity(command, sentence))
+    # scores=[]
+    # for sentence in phrases:
+    #     scores.append(cosine_similarity(command, sentence))
+    #
+    # response = responses[np.argmax(scores)]
+    response = command
 
-    response = responses[np.argmax(scores)]
-        
 
     # Sends the response back to the channel
     slack_client.api_call(
