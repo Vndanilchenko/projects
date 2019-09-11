@@ -5,7 +5,10 @@ import time
 # from slackclient import SlackClient
 # from slack import WebClient
 from slackclient import SlackClient
-from sklearn.metrics.pairwise import cosine_similarity
+# from sklearn.metrics.pairwise import cosine_similarity
+import scipy
+
+# from scipy import spatial
 import numpy as np
 
 
@@ -62,12 +65,11 @@ def handle_command(command, channel):
     #     response = "Sure...write some more code then I can do that!"
 
     # попробуем вывести овтеты из словаря, если текст сообщения будет более чем на 0,9 соответствовать сообщениям в словаре
-    # scores=[]
-    # for sentence in phrases:
-    #     scores.append(cosine_similarity(command, sentence))
-    #
-    # response = responses[np.argmax(scores)]
-    response = command
+    scores = []
+    for sentence in phrases:
+        # scores.append(cosine_similarity('првиет', sentence))
+        scores.append(1-scipy.spatial.distance.cosine(command, sentence))
+    response = responses[np.argmax(scores)]
 
 
     # Sends the response back to the channel
