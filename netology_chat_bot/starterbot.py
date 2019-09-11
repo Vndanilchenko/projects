@@ -5,6 +5,8 @@ import time
 # from slackclient import SlackClient
 # from slack import WebClient
 from slackclient import SlackClient
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
 
 # instantiate Slack client
@@ -17,6 +19,12 @@ starterbot_id = None
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
 EXAMPLE_COMMAND = "do"
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
+
+phrases = ['привет', 'пока', 'как дела', 'расскажи анекдот', 'сделай рассылку студентам', 'какая погода', 'когда будет следующий урок?']
+responses = ['привет, я чат-бот, твой друг', 'с нетерпением жду снова в гости', 'да все отлично, че сам как?', 'пока не умею рассказывать анекдоты', 'рассылка будет отправлена сразу, как научусь', 'посмотри лучше в интернете, я еще не умею ее предсказать', 'ты уже отучился, какие уроки']
+
+
+
 
 def parse_bot_commands(slack_events):
     """
@@ -45,13 +53,21 @@ def handle_command(command, channel):
         Executes bot command if the command is known
     """
     # Default response is help text for the user
-    default_response = "Not sure what you mean. Try *{}*.".format(EXAMPLE_COMMAND)
+    default_response = "Не понимаю, попробуйте перефразировать вопрос"
 
     # Finds and executes the given command, filling in response
     response = None
     # This is where you start to implement more commands!
     if command.startswith(EXAMPLE_COMMAND):
         response = "Sure...write some more code then I can do that!"
+
+    # попробуем вывести овтеты из словаря, если текст сообщения будет более чем на 0,9 соответствовать сообщениям в словаре
+    scores=[]
+    for sentence in phrases:
+        scores.append(cosine_similarity(command, sentence))
+
+    response = responses[np.argmax(scores)]
+        
 
     # Sends the response back to the channel
     slack_client.api_call(
@@ -62,7 +78,7 @@ def handle_command(command, channel):
 
 if __name__ == "__main__":
     if slack_client.rtm_connect(with_team_state=False):
-        print("Starter Bot connected and running!")
+        print("чат-бот включился в работу")
         # Read bot's user ID by calling Web API method `auth.test`
         starterbot_id = slack_client.api_call("auth.test")["user_id"]
         while True:
@@ -71,4 +87,4 @@ if __name__ == "__main__":
                 handle_command(command, channel)
             time.sleep(RTM_READ_DELAY)
     else:
-        print("Connection failed. Exception traceback printed above.")
+        print("нет соединения с сервером!")

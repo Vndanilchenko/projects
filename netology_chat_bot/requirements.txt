@@ -1,3 +1,5 @@
+scikit-learn
+numpy
 httplib2
 slacker
 Flask==0.12
