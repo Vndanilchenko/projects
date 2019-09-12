@@ -103,7 +103,7 @@ def handle_command(command, channel):
     # scores.append(1-scipy.spatial.distance.cosine(command, sentence))
 
     # response = responses[int(np.argmax(model.predict(tfidf_vec.transpose(command))))-1]
-
+    # command='как дела'
     prediction = model.predict_proba(tfidf_vec.transform([command])).tolist()[0]
     pred_index = [i for i, j in enumerate(prediction) if j == max(prediction)]
 
@@ -111,11 +111,11 @@ def handle_command(command, channel):
         if len(pred_index) > 1:
             response='возможные интенты: '
             for i in range(len(pred_index)):
-                response=response + ' ; ' + intent[pred_index[i]]
+                response = response + ' ; ' + intent[pred_index[i]]
         else:
-            response = responses[pred_index]
+            response = responses[pred_index[0]]
     else:
-        response = "Не понимаю, попробуйте перефразировать вопрос"
+        response = "Недостаточно тебя понимаю, попробуйте перефразировать вопрос"
     # response = "Не понимаю, что вообще происходит"
 
     # Sends the response back to the channel
