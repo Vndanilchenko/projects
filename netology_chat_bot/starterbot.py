@@ -29,18 +29,24 @@ MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 # responses = ['привет, я чат-бот, твой друг', 'с нетерпением жду снова в гости', 'да все отлично, че сам как?', 'пока не умею рассказывать анекдоты', 'рассылка будет отправлена сразу, как научусь', 'посмотри лучше в интернете, я еще не умею ее предсказать', 'ты уже отучился, какие уроки']
 
 # df=pd.read_excel(r'C:\Users\vndan\projects\netology_chat_bot\kb\knowledge_base.xlsx', sheet_name='response')
-df=pd.read_excel('knowledge_base.xlsx', sheet_name='response')
+# скрыл ----------------------
+# df=pd.read_excel('knowledge_base.xlsx', sheet_name='response')
+#
+# responses = df.реакция.tolist()
+# intent = df.интент.tolist()
+# target = df.класс.tolist()
+# скрыл ----------------------
 
-responses = df.реакция.tolist()
-intent = df.интент.tolist()
-target = df.класс.tolist()
 
 # Загрузим классификаторы
 # model = joblib.load(r'C:\Users\vndan\projects\netology_chat_bot\cls\basic_models.pk')
 # tfidf_vec = joblib.load(r'C:\Users\vndan\projects\netology_chat_bot\cls\tfidf_vectoriser.pk')
 
+# скрыл ----------------------
 model=joblib.load('basic_models.pk')
 tfidf_vec = joblib.load('tfidf_vectoriser.pk')
+# скрыл ----------------------
+
 
 # prediction=model.predict_proba(tfidf_vec.transform(['узнать расписание занятий'])).tolist()[0]
 # pred_index=[i for i,j in enumerate(prediction) if j==max(prediction)]
@@ -105,7 +111,7 @@ def handle_command(command, channel):
     #         response = responses[pred_index]
     # else:
     #     response = "Не понимаю, попробуйте перефразировать вопрос"
-    response = "Не понимаю, попробуйте перефразировать вопрос"
+    response = "Не понимаю, что вообще происходит"
 
     # Sends the response back to the channel
     slack_client.api_call(
