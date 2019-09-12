@@ -42,12 +42,12 @@ target = df.класс.tolist()
 model=joblib.load('basic_models.pk')
 tfidf_vec = joblib.load('tfidf_vectoriser.pk')
 
-prediction=model.predict_proba(tfidf_vec.transform(['узнать расписание занятий'])).tolist()[0]
-pred_index=[i for i,j in enumerate(prediction) if j==max(prediction)]
-
-if len(pred_index)>1:
-    response = 'возможны 2 интента: ' + intent[pred_index[0]] + ' и ' + intent[pred_index[1]]
-print(response)
+# prediction=model.predict_proba(tfidf_vec.transform(['узнать расписание занятий'])).tolist()[0]
+# pred_index=[i for i,j in enumerate(prediction) if j==max(prediction)]
+#
+# if len(pred_index)>1:
+#     response = 'возможны 2 интента: ' + intent[pred_index[0]] + ' и ' + intent[pred_index[1]]
+# print(response)
 
 
 def parse_bot_commands(slack_events):
@@ -91,15 +91,20 @@ def handle_command(command, channel):
         # scores.append(cosine_similarity('првиет', sentence))
         # scores.append(1-scipy.spatial.distance.cosine(command, sentence))
 
-    response = responses[int(np.argmax(model.predict(tfidf_vec.transpose(command))))-1]
-    prediction = model.predict_proba(tfidf_vec.transform(['узнать расписание занятий'])).tolist()[0]
+    # response = responses[int(np.argmax(model.predict(tfidf_vec.transpose(command))))-1]
+
+    prediction = model.predict_proba(tfidf_vec.transform([command])).tolist()[0]
     pred_index = [i for i, j in enumerate(prediction) if j == max(prediction)]
 
-    if len(pred_index) == 2:
-        response = 'возможны 2 интента: ' + intent[pred_index[0]] + ' и ' + intent[pred_index[1]]
+    if max(prediction)>0.8:
+        if len(pred_index) > 1:
+            response='возможные интенты: '
+            for i in range(len(pred_index)):
+                response=response + ' ; ' + intent[pred_index[i]]
+        else:
+            response = responses[pred_index]
     else:
-        response = responses[pred_index]
-
+        response = "Не понимаю, попробуйте перефразировать вопрос"
 
     # Sends the response back to the channel
     slack_client.api_call(
