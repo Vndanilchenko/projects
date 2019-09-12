@@ -7,7 +7,7 @@ import time
 from slackclient import SlackClient
 # from sklearn.metrics.pairwise import cosine_similarity
 # import scipy.spatial.distance.cosine
-
+import dill as pickle
 # from scipy import spatial
 import numpy as np
 import pandas as pd
@@ -29,11 +29,11 @@ MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 
 # df=pd.read_excel(r'C:\Users\vndan\projects\netology_chat_bot\kb\knowledge_base.xlsx', sheet_name='response')
 # скрыл ----------------------
-# df=pd.read_excel('knowledge_base.xlsx', sheet_name='response')
-#
-# responses = df.реакция.tolist()
-# intent = df.интент.tolist()
-# target = df.класс.tolist()
+df=pd.read_excel('knowledge_base.xlsx', sheet_name='response')
+
+responses = df.реакция.tolist()
+intent = df.интент.tolist()
+target = df.класс.tolist()
 # скрыл ----------------------
 
 
@@ -44,10 +44,12 @@ MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 # скрыл ----------------------
 # model = joblib.load('basic_models.pk')
 # tfidf_vec = joblib.load('tfidf_vectoriser.pk')
-
-
 # скрыл ----------------------
+with open('tfidf_vectoriser2.pk' ,'rb') as f:
+    tfidf_vec = pickle.load(f)
 
+with open('basic_models2.pk' ,'rb') as f:
+    model = pickle.load(f)
 
 # prediction=model.predict_proba(tfidf_vec.transform(['узнать расписание занятий'])).tolist()[0]
 # pred_index=[i for i,j in enumerate(prediction) if j==max(prediction)]
@@ -102,19 +104,19 @@ def handle_command(command, channel):
 
     # response = responses[int(np.argmax(model.predict(tfidf_vec.transpose(command))))-1]
 
-    # prediction = model.predict_proba(tfidf_vec.transform([command])).tolist()[0]
-    # pred_index = [i for i, j in enumerate(prediction) if j == max(prediction)]
-    #
-    # if max(prediction)>0.8:
-    #     if len(pred_index) > 1:
-    #         response='возможные интенты: '
-    #         for i in range(len(pred_index)):
-    #             response=response + ' ; ' + intent[pred_index[i]]
-    #     else:
-    #         response = responses[pred_index]
-    # else:
-    #     response = "Не понимаю, попробуйте перефразировать вопрос"
-    response = "Не понимаю, что вообще происходит"
+    prediction = model.predict_proba(tfidf_vec.transform([command])).tolist()[0]
+    pred_index = [i for i, j in enumerate(prediction) if j == max(prediction)]
+
+    if max(prediction)>0.8:
+        if len(pred_index) > 1:
+            response='возможные интенты: '
+            for i in range(len(pred_index)):
+                response=response + ' ; ' + intent[pred_index[i]]
+        else:
+            response = responses[pred_index]
+    else:
+        response = "Не понимаю, попробуйте перефразировать вопрос"
+    # response = "Не понимаю, что вообще происходит"
 
     # Sends the response back to the channel
     slack_client.api_call(
