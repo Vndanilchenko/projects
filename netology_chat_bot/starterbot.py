@@ -93,18 +93,19 @@ def handle_command(command, channel):
 
     # response = responses[int(np.argmax(model.predict(tfidf_vec.transpose(command))))-1]
 
-    prediction = model.predict_proba(tfidf_vec.transform([command])).tolist()[0]
-    pred_index = [i for i, j in enumerate(prediction) if j == max(prediction)]
-
-    if max(prediction)>0.8:
-        if len(pred_index) > 1:
-            response='возможные интенты: '
-            for i in range(len(pred_index)):
-                response=response + ' ; ' + intent[pred_index[i]]
-        else:
-            response = responses[pred_index]
-    else:
-        response = "Не понимаю, попробуйте перефразировать вопрос"
+    # prediction = model.predict_proba(tfidf_vec.transform([command])).tolist()[0]
+    # pred_index = [i for i, j in enumerate(prediction) if j == max(prediction)]
+    #
+    # if max(prediction)>0.8:
+    #     if len(pred_index) > 1:
+    #         response='возможные интенты: '
+    #         for i in range(len(pred_index)):
+    #             response=response + ' ; ' + intent[pred_index[i]]
+    #     else:
+    #         response = responses[pred_index]
+    # else:
+    #     response = "Не понимаю, попробуйте перефразировать вопрос"
+    response = "Не понимаю, попробуйте перефразировать вопрос"
 
     # Sends the response back to the channel
     slack_client.api_call(
