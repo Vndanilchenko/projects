@@ -13,7 +13,6 @@ import numpy as np
 import pandas as pd
 import joblib
 
-
 # instantiate Slack client
 slack_client = SlackClient(os.environ.get('SlACK_TOKEN'))
 
@@ -21,7 +20,7 @@ slack_client = SlackClient(os.environ.get('SlACK_TOKEN'))
 starterbot_id = None
 
 # constants
-RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
+RTM_READ_DELAY = 1  # 1 second delay between reading from RTM
 EXAMPLE_COMMAND = "do"
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 #
@@ -43,8 +42,10 @@ MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 # tfidf_vec = joblib.load(r'C:\Users\vndan\projects\netology_chat_bot\cls\tfidf_vectoriser.pk')
 
 # скрыл ----------------------
-model=joblib.load('basic_models.pk')
-tfidf_vec = joblib.load('tfidf_vectoriser.pk')
+# model = joblib.load('basic_models.pk')
+# tfidf_vec = joblib.load('tfidf_vectoriser.pk')
+
+
 # скрыл ----------------------
 
 
@@ -69,6 +70,7 @@ def parse_bot_commands(slack_events):
                 return message, event["channel"]
     return None, None
 
+
 def parse_direct_mention(message_text):
     """
         Finds a direct mention (a mention that is at the beginning) in message text
@@ -77,6 +79,7 @@ def parse_direct_mention(message_text):
     matches = re.search(MENTION_REGEX, message_text)
     # the first group contains the username, the second group contains the remaining message
     return (matches.group(1), matches.group(2).strip()) if matches else (None, None)
+
 
 def handle_command(command, channel):
     """
@@ -94,8 +97,8 @@ def handle_command(command, channel):
     # попробуем вывести овтеты из словаря, если текст сообщения будет более чем на 0,9 соответствовать сообщениям в словаре
     # scores = []
     # for sentence in phrases:
-        # scores.append(cosine_similarity('првиет', sentence))
-        # scores.append(1-scipy.spatial.distance.cosine(command, sentence))
+    # scores.append(cosine_similarity('првиет', sentence))
+    # scores.append(1-scipy.spatial.distance.cosine(command, sentence))
 
     # response = responses[int(np.argmax(model.predict(tfidf_vec.transpose(command))))-1]
 
