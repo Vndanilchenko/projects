@@ -6,10 +6,12 @@ import time
 # from slack import WebClient
 from slackclient import SlackClient
 # from sklearn.metrics.pairwise import cosine_similarity
-import scipy
+# import scipy.spatial.distance.cosine
 
 # from scipy import spatial
 import numpy as np
+import pandas as pd
+import joblib
 
 
 # instantiate Slack client
@@ -22,12 +24,23 @@ starterbot_id = None
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
 EXAMPLE_COMMAND = "do"
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
+#
+# phrases = ['привет', 'пока', 'как дела', 'расскажи анекдот', 'сделай рассылку студентам', 'какая погода', 'когда будет следующий урок?']
+# responses = ['привет, я чат-бот, твой друг', 'с нетерпением жду снова в гости', 'да все отлично, че сам как?', 'пока не умею рассказывать анекдоты', 'рассылка будет отправлена сразу, как научусь', 'посмотри лучше в интернете, я еще не умею ее предсказать', 'ты уже отучился, какие уроки']
 
-phrases = ['привет', 'пока', 'как дела', 'расскажи анекдот', 'сделай рассылку студентам', 'какая погода', 'когда будет следующий урок?']
-responses = ['привет, я чат-бот, твой друг', 'с нетерпением жду снова в гости', 'да все отлично, че сам как?', 'пока не умею рассказывать анекдоты', 'рассылка будет отправлена сразу, как научусь', 'посмотри лучше в интернете, я еще не умею ее предсказать', 'ты уже отучился, какие уроки']
+# df=pd.read_excel('C:\Users\vndan\projects\netology_chat_bot\kb\knowledge_base.xlsx', sheet_name='response')
+df=pd.read_excel('../kb/knowledge_base.xlsx', sheet_name='response')
 
+responses = df.реакция.tolist()
+intent = df.интент.tolist()
+target = df.класс.tolist()
 
+# Загрузим классификаторы
+# model=joblib.load(r'C:\Users\vndan\projects\netology_chat_bot\cls\basic_models.pk')
+# tfidf_vec = joblib.load(r'C:\Users\vndan\projects\netology_chat_bot\cls\tfidf_vectoriser.pk')
 
+model=joblib.load('../cls/basic_models.pk')
+tfidf_vec = joblib.load('../cls/tfidf_vectoriser.pk')
 
 def parse_bot_commands(slack_events):
     """
@@ -65,11 +78,12 @@ def handle_command(command, channel):
     #     response = "Sure...write some more code then I can do that!"
 
     # попробуем вывести овтеты из словаря, если текст сообщения будет более чем на 0,9 соответствовать сообщениям в словаре
-    scores = []
-    for sentence in phrases:
+    # scores = []
+    # for sentence in phrases:
         # scores.append(cosine_similarity('првиет', sentence))
-        scores.append(1-scipy.spatial.distance.cosine(command, sentence))
-    response = responses[np.argmax(scores)]
+        # scores.append(1-scipy.spatial.distance.cosine(command, sentence))
+
+    response = responses[int(np.argmax(model.predict(tfidf_vec.transpose(command))))-1]
 
 
     # Sends the response back to the channel
