@@ -28,7 +28,7 @@ MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 # phrases = ['привет', 'пока', 'как дела', 'расскажи анекдот', 'сделай рассылку студентам', 'какая погода', 'когда будет следующий урок?']
 # responses = ['привет, я чат-бот, твой друг', 'с нетерпением жду снова в гости', 'да все отлично, че сам как?', 'пока не умею рассказывать анекдоты', 'рассылка будет отправлена сразу, как научусь', 'посмотри лучше в интернете, я еще не умею ее предсказать', 'ты уже отучился, какие уроки']
 
-# df=pd.read_excel('C:\Users\vndan\projects\netology_chat_bot\kb\knowledge_base.xlsx', sheet_name='response')
+# df=pd.read_excel(r'C:\Users\vndan\projects\netology_chat_bot\kb\knowledge_base.xlsx', sheet_name='response')
 df=pd.read_excel('../kb/knowledge_base.xlsx', sheet_name='response')
 
 responses = df.реакция.tolist()
@@ -36,11 +36,19 @@ intent = df.интент.tolist()
 target = df.класс.tolist()
 
 # Загрузим классификаторы
-# model=joblib.load(r'C:\Users\vndan\projects\netology_chat_bot\cls\basic_models.pk')
+# model = joblib.load(r'C:\Users\vndan\projects\netology_chat_bot\cls\basic_models.pk')
 # tfidf_vec = joblib.load(r'C:\Users\vndan\projects\netology_chat_bot\cls\tfidf_vectoriser.pk')
 
 model=joblib.load('../cls/basic_models.pk')
 tfidf_vec = joblib.load('../cls/tfidf_vectoriser.pk')
+
+prediction=model.predict_proba(tfidf_vec.transform(['узнать расписание занятий'])).tolist()[0]
+pred_index=[i for i,j in enumerate(prediction) if j==max(prediction)]
+
+if len(pred_index)>1:
+    response = 'возможны 2 интента: ' + intent[pred_index[0]] + ' и ' + intent[pred_index[1]]
+print(response)
+
 
 def parse_bot_commands(slack_events):
     """
@@ -84,6 +92,13 @@ def handle_command(command, channel):
         # scores.append(1-scipy.spatial.distance.cosine(command, sentence))
 
     response = responses[int(np.argmax(model.predict(tfidf_vec.transpose(command))))-1]
+    prediction = model.predict_proba(tfidf_vec.transform(['узнать расписание занятий'])).tolist()[0]
+    pred_index = [i for i, j in enumerate(prediction) if j == max(prediction)]
+
+    if len(pred_index) > 1:
+        response = 'возможны 2 интента: ' + intent[pred_index[0]] + ' и ' + intent[pred_index[1]]
+    else:
+        response = responses[pred_index]
 
 
     # Sends the response back to the channel
@@ -92,6 +107,7 @@ def handle_command(command, channel):
         channel=channel,
         text=response or default_response
     )
+
 
 if __name__ == "__main__":
     if slack_client.rtm_connect(with_team_state=False):
