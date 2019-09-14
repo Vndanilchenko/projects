@@ -11,7 +11,7 @@ import dill as pickle
 # from scipy import spatial
 import numpy as np
 import pandas as pd
-import joblib
+# import joblib
 
 # instantiate Slack client
 slack_client = SlackClient(os.environ.get('SlACK_TOKEN'))
@@ -30,6 +30,7 @@ MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 # df=pd.read_excel(r'C:\Users\vndan\projects\netology_chat_bot\kb\knowledge_base.xlsx', sheet_name='response')
 # скрыл ----------------------
 # df=pd.read_excel('knowledge_base.xlsx', sheet_name='response')
+
 df=pd.DataFrame({
     'класс':[1,
             2,
@@ -70,6 +71,7 @@ target = df.класс.tolist()
 # model = joblib.load('basic_models.pk')
 # tfidf_vec = joblib.load('tfidf_vectoriser.pk')
 # скрыл ----------------------
+global tfidf_vec, model
 with open('tfidf_vectoriser2.pk' ,'rb') as f:
     tfidf_vec = pickle.load(f)
 
