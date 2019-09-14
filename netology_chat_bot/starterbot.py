@@ -18,7 +18,12 @@ slack_client = SlackClient(os.environ.get('SlACK_TOKEN'))
 
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 starterbot_id = None
+# global variables
+tfidf_vec = None
+model = None
+responses = None
 
+tfidf_vec
 # constants
 RTM_READ_DELAY = 1  # 1 second delay between reading from RTM
 EXAMPLE_COMMAND = "do"
@@ -57,6 +62,7 @@ df=pd.DataFrame({
             ]
             })
 
+global responses
 responses = df.реакция.tolist()
 intent = df.интент.tolist()
 target = df.класс.tolist()
@@ -71,7 +77,9 @@ target = df.класс.tolist()
 # model = joblib.load('basic_models.pk')
 # tfidf_vec = joblib.load('tfidf_vectoriser.pk')
 # скрыл ----------------------
-global tfidf_vec, model
+global tfidf_vec
+global model
+
 with open('tfidf_vectoriser2.pk' ,'rb') as f:
     tfidf_vec = pickle.load(f)
 
@@ -136,7 +144,7 @@ def handle_command(command, channel):
 
     if max(prediction)>0.8:
         if len(pred_index) > 1:
-            response='возможные интенты: '
+            response = 'возможные интенты: '
             for i in range(len(pred_index)):
                 response = response + ' ; ' + intent[pred_index[i]]
         else:
