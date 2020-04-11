@@ -1,0 +1,84 @@
+version: '3'
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    expose:
+      - "9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_BROKER_ID: 1
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    depends_on:
+      - zookeeper
+
+
+  app:
+    tty: true
+    # image: python3.6-slim
+    build: ./.
+    # т.к. kafka после запуска машины запускается не сразу, то необходим скрипт
+    # wait-for-it.sh который будет слушать порт 9093 и выполнит запрос написаннвй после --
+    # убирание из скрипта \r (специфика винды)
+    # и запуск скрипта wait-for-it с командой запуска воркера
+    command: bash -c "./wait-for-it.unix.sh cassandra:9042 -t 50 -- faust -A messages_producer worker -l info --web-port 6066 &
+             ./wait-for-it.unix.sh cassandra:9042 -t 50 -- faust -A preprocess worker --web-port 6067 &
+             ./wait-for-it.unix.sh cassandra:9042 -t 50 -- faust -A reply worker --web-port 6068 &
+             ./wait-for-it.unix.sh cassandra:9042 -t 50 -- faust -A reply worker --web-port 6069 &
+             ./wait-for-it.unix.sh cassandra:9042 -t 50 -- faust -A reply worker  --web-port 6070"
+    environment:
+      AM_I_IN_A_DOCKER_CONTAINER: INSIDE
+
+    external_links:
+      - faust_kafka_1:kafka
+      - faust_cassandra_1:cassandra
+    depends_on:
+      - kafka
+      - cassandra
+      # - zookeeper
+      # - schema-registry
+    ports:
+      - "8084:80"
+      - "8000:8000"
+    volumes:
+      - ./.:/application
+      #- app-python-site-packages:/usr/local/lib/python3.6/site-packages
+      #- app-usr-local-bin:/usr/local/bin
+      #- worker-data:/data/
+
+  cassandra:
+    image: 'bitnami/cassandra:3'
+    ports:
+      - '9042:9042'
+    # expose:
+    #   - "9042"
+    volumes:
+      - 'cassandra_data:/bitnami'
+    environment:
+      - CASSANDRA_SEEDS=cassandra
+      - CASSANDRA_PASSWORD_SEEDER=yes
+      - CASSANDRA_PASSWORD=cassandra
+
+volumes:
+  app-python-site-packages:
+    driver: local
+  app-usr-local-bin:
+    driver: local
+  worker-data:
+    driver: local
+  cassandra_data:
+    driver: local

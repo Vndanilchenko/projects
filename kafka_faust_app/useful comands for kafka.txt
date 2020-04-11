@@ -1,0 +1,5 @@
+C:\Apache\kafka_2.11-2.4.1\bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic test - запуск продюсера на теме test
+
+C:\Apache\kafka_2.11-2.4.1\bin\windows\kafka-consumer-groups.bat --bootstrap-server localhost:9092 --describe --group greetings_group -отображение отстования каждого сообщения от предыдущего
+
+C:\Apache\kafka_2.11-2.4.1\bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --topic response_topic --alter --partitions 7 - изменение количества партитиций для топика
